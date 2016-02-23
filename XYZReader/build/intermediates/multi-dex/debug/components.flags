@@ -1,0 +1,46 @@
+-injars 'C:\Users\comrade.marie\Android_Studio_Projects\android-developer-nanodegree\xyzreader\XYZReader\build\intermediates\multi-dex\debug\allclasses.jar'
+-outjars 'C:\Users\comrade.marie\Android_Studio_Projects\android-developer-nanodegree\xyzreader\XYZReader\build\intermediates\multi-dex\debug\componentClasses.jar'
+
+-libraryjars 'C:\Users\comrade.marie\AppData\Local\Android\sdk1\build-tools\22.0.1\lib\shrinkedAndroid.jar'
+
+-forceprocessing
+-dontoptimize
+-dontobfuscate
+-dontpreverify
+-dontwarn
+-printconfiguration 'C:\Users\comrade.marie\Android_Studio_Projects\android-developer-nanodegree\xyzreader\XYZReader\build\intermediates\multi-dex\debug\components.flags'
+
+
+-keep class null {
+    <init>();
+    void attachBaseContext(android.content.Context);
+}
+
+-keep class com.example.xyzreader.ui.ArticleListActivity {
+    <init>();
+}
+
+-keep class com.example.xyzreader.ui.ArticleDetailActivity {
+    <init>();
+}
+
+-keep class com.example.xyzreader.data.UpdaterService {
+    <init>();
+}
+
+-keep class com.example.xyzreader.data.ItemsProvider {
+    <init>();
+}
+
+-keep class android.support.v7.widget.TestActivity {
+    <init>();
+}
+
+-keep public class * extends android.app.backup.BackupAgent {
+    <init>();
+}
+
+-keep public class * extends java.lang.annotation.Annotation {
+    <fields>;
+    <methods>;
+}
