@@ -32,7 +32,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingTop="16dp"
-            android:textColor="@color/ltgray" />
+            android:textColor="@color/light_cyan" />
 
         <TextView
             android:id="@+id/article_subtitle"

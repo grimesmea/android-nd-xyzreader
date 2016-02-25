@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<merger version="3">
-    <dataSet config="main">
-        <source
-            path="C:\Users\comrade.marie\Android_Studio_Projects\android-developer-nanodegree\xyzreader\XYZReader\src\androidTest\assets" />
-    </dataSet>
-</merger>
