@@ -1,7 +1,7 @@
 <com.example.xyzreader.ui.DrawInsetsFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/draw_insets_frame_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent">>
 
     <com.example.xyzreader.ui.ObservableScrollView
         android:id="@+id/scrollview"
@@ -82,7 +82,7 @@
                     android:layout_marginRight="@dimen/detail_inner_horiz_margin"
                     android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier"
                     android:paddingBottom="@dimen/detail_body_bottom_margin"
-                    android:textColor="@color/light_cyan"
+                    android:textColor="@color/primary_text_light"
                     android:textColorLink="@color/accent"
                     android:textSize="@dimen/detail_body_text_size" />
 

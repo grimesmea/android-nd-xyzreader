@@ -16,11 +16,12 @@
 -->
 
 <resources>
-    <color name="photo_placeholder">#ccc</color>
-
     <color name="primary">#FF5722</color>
     <color name="primary_dark">#BF360C</color>
     <color name="accent">#26C6DA</color>
-    <color name="yellow">#FFEB3B</color>
-    <color name="light_cyan">#B2EBF2</color>
+
+    <color name="primary_text_light">#F2000000</color>
+    <color name="secondary_text_light">#73000000</color>
+
+    <color name="photo_placeholder">#CCCCCC</color>
 </resources>
