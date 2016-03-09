@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -37,6 +38,8 @@ public class ArticleDetailFragment extends Fragment implements
     public static final String ARG_ITEM_ID = "item_id";
     private static final String LOG_TAG = "ArticleDetailFragment";
 
+    private AppCompatActivity mActivity;
+    private Toolbar mToolbar;
     private Cursor mCursor;
     private long mItemId;
     private View mRootView;
@@ -95,14 +98,15 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
+        mActivity = (AppCompatActivity) getActivity();
+
         bindViews();
         updateToolbar();
         return mRootView;
     }
 
     private void updateToolbar() {
-        Toolbar mToolbar = (Toolbar) mRootView.findViewById(R.id.article_toolbar);
-        AppCompatActivity mActivity = (AppCompatActivity) getActivity();
+        mToolbar = (Toolbar) mRootView.findViewById(R.id.article_toolbar);
         mActivity.setSupportActionBar(mToolbar);
         mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
         mActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -124,6 +128,8 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
+            CollapsingToolbarLayout mCollapsingToolbarLayout = (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
+            mCollapsingToolbarLayout.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             bylineView.setText(Html.fromHtml(
                     DateUtils.getRelativeTimeSpanString(
