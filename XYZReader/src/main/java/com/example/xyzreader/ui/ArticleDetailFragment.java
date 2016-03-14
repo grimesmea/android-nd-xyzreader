@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -35,10 +36,13 @@ import com.example.xyzreader.data.ArticleLoader;
  */
 public class ArticleDetailFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
+    public static final String ARG_SCROLL_OFFSET = "scroll_offset";
     public static final String ARG_ITEM_ID = "item_id";
-    private static final String LOG_TAG = "ArticleDetailFragment";
+    private static final String LOG_TAG = ArticleDetailFragment.class.getSimpleName();
 
+    private int scrollRange;
     private AppCompatActivity mActivity;
+    private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
     private Cursor mCursor;
     private long mItemId;
@@ -62,11 +66,23 @@ public class ArticleDetailFragment extends Fragment implements
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        getArguments().putInt(ARG_SCROLL_OFFSET, scrollRange);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mItemId = getArguments().getLong(ARG_ITEM_ID);
+        }
+
+        if (getArguments().containsKey(ARG_SCROLL_OFFSET)) {
+            scrollRange = getArguments().getInt(ARG_SCROLL_OFFSET);
+        } else {
+            scrollRange = -1;
         }
 
         setHasOptionsMenu(true);
@@ -99,6 +115,8 @@ public class ArticleDetailFragment extends Fragment implements
         });
 
         mActivity = (AppCompatActivity) getActivity();
+        mToolbar = (Toolbar) mRootView.findViewById(R.id.article_toolbar);
+        mAppBarLayout = (AppBarLayout) mRootView.findViewById(R.id.appbar);
 
         bindViews();
         updateToolbar();
@@ -106,7 +124,6 @@ public class ArticleDetailFragment extends Fragment implements
     }
 
     private void updateToolbar() {
-        mToolbar = (Toolbar) mRootView.findViewById(R.id.article_toolbar);
         mActivity.setSupportActionBar(mToolbar);
         mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
         mActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -128,8 +145,26 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
-            CollapsingToolbarLayout mCollapsingToolbarLayout = (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
-            mCollapsingToolbarLayout.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
+
+            final CollapsingToolbarLayout mCollapsingToolbarLayout = (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
+            mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+                boolean isShow = false;
+
+                @Override
+                public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                    if (scrollRange == -1) {
+                        scrollRange = appBarLayout.getTotalScrollRange();
+                    }
+                    if (scrollRange + verticalOffset == 0) {
+                        mCollapsingToolbarLayout.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
+                        isShow = true;
+                    } else if (isShow) {
+                        mCollapsingToolbarLayout.setTitle("");
+                        isShow = false;
+                    }
+                }
+            });
+
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             bylineView.setText(Html.fromHtml(
                     DateUtils.getRelativeTimeSpanString(

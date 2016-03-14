@@ -1,7 +1,4 @@
 <resources>
-    <dimen name="activity_horizontal_margin">32dp</dimen>
-    <dimen name="activity_vertical_margin">4dp</dimen>
-
     <!-- minus 64 - 12 -->
     <integer name="list_column_count">3</integer>
 

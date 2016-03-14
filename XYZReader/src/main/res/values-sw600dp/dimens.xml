@@ -1,4 +1,6 @@
 <resources>
+    <dimen name="article_list_toolbar_height">128dp</dimen>
+
     <!-- detail -->
     <dimen name="detail_title_text_size">42sp</dimen>
     <dimen name="detail_body_text_size">20sp</dimen>

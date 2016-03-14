@@ -31,6 +31,7 @@ import com.example.xyzreader.data.UpdaterService;
  */
 public class ArticleListActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String LOG_TAG = ArticleListActivity.class.getSimpleName();
 
     private Toolbar mToolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -56,16 +57,22 @@ public class ArticleListActivity extends AppCompatActivity implements
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                startService(new Intent(getApplicationContext(), UpdaterService.class));
+            }
+        });
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         getLoaderManager().initLoader(0, null, this);
 
         if (savedInstanceState == null) {
-            refresh();
+            onRefresh();
         }
     }
 
-    private void refresh() {
+    private void onRefresh() {
         startService(new Intent(this, UpdaterService.class));
     }
 

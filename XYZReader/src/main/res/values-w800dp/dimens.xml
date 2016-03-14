@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="article_list_toolbar_height">112dp</dimen>
+
     <!-- detail fragment -->
     <dimen name="detail_toolbar_height">400dp</dimen>
     <dimen name="detail_margin_top">-104dp</dimen>
