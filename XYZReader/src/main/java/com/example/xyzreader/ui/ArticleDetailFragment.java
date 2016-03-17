@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -40,7 +39,6 @@ public class ArticleDetailFragment extends Fragment implements
     public static final String ARG_ITEM_ID = "item_id";
     private static final String LOG_TAG = ArticleDetailFragment.class.getSimpleName();
 
-    private int scrollRange;
     private AppCompatActivity mActivity;
     private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
@@ -66,23 +64,11 @@ public class ArticleDetailFragment extends Fragment implements
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        getArguments().putInt(ARG_SCROLL_OFFSET, scrollRange);
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mItemId = getArguments().getLong(ARG_ITEM_ID);
-        }
-
-        if (getArguments().containsKey(ARG_SCROLL_OFFSET)) {
-            scrollRange = getArguments().getInt(ARG_SCROLL_OFFSET);
-        } else {
-            scrollRange = -1;
         }
 
         setHasOptionsMenu(true);
@@ -145,25 +131,6 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
-
-            final CollapsingToolbarLayout mCollapsingToolbarLayout = (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
-            mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-                boolean isShow = false;
-
-                @Override
-                public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                    if (scrollRange == -1) {
-                        scrollRange = appBarLayout.getTotalScrollRange();
-                    }
-                    if (scrollRange + verticalOffset == 0) {
-                        mCollapsingToolbarLayout.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
-                        isShow = true;
-                    } else if (isShow) {
-                        mCollapsingToolbarLayout.setTitle("");
-                        isShow = false;
-                    }
-                }
-            });
 
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             bylineView.setText(Html.fromHtml(
