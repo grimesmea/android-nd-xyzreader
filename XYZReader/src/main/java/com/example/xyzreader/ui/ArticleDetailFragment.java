@@ -8,7 +8,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -18,6 +19,7 @@ import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -40,7 +42,7 @@ public class ArticleDetailFragment extends Fragment implements
     private static final String LOG_TAG = ArticleDetailFragment.class.getSimpleName();
 
     private AppCompatActivity mActivity;
-    private AppBarLayout mAppBarLayout;
+    private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private Toolbar mToolbar;
     private Cursor mCursor;
     private long mItemId;
@@ -102,7 +104,18 @@ public class ArticleDetailFragment extends Fragment implements
 
         mActivity = (AppCompatActivity) getActivity();
         mToolbar = (Toolbar) mRootView.findViewById(R.id.article_toolbar);
-        mAppBarLayout = (AppBarLayout) mRootView.findViewById(R.id.appbar);
+        mCollapsingToolbarLayout = (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
+
+        // Work around for 	CoordinatorLayout NullPointerException in onTouchEvent
+        // (https://code.google.com/p/android/issues/detail?id=183166) that did not resolve when
+        // 23.0.1+ support library.
+        CoordinatorLayout mCoordinatorLayout = (CoordinatorLayout) mRootView.findViewById(R.id.coordinator_layout);
+        mCoordinatorLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
 
         bindViews();
         updateToolbar();
@@ -153,6 +166,7 @@ public class ArticleDetailFragment extends Fragment implements
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
+
                                 updateToolbar();
                             }
                         }
