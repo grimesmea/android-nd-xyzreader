@@ -37,7 +37,7 @@ import com.example.xyzreader.data.ArticleLoader;
  */
 public class ArticleDetailFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
-    public static final String ARG_SCROLL_OFFSET = "scroll_offset";
+
     public static final String ARG_ITEM_ID = "item_id";
     private static final String LOG_TAG = ArticleDetailFragment.class.getSimpleName();
 
@@ -61,6 +61,7 @@ public class ArticleDetailFragment extends Fragment implements
         Bundle arguments = new Bundle();
         arguments.putLong(ARG_ITEM_ID, itemId);
         ArticleDetailFragment fragment = new ArticleDetailFragment();
+        Log.d(LOG_TAG, "fragment constructed: " + fragment.toString() + ":" + itemId);
         fragment.setArguments(arguments);
         return fragment;
     }
@@ -90,6 +91,7 @@ public class ArticleDetailFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "fragement view created: " + this);
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
 
         mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
@@ -123,9 +125,23 @@ public class ArticleDetailFragment extends Fragment implements
     }
 
     private void updateToolbar() {
-        mActivity.setSupportActionBar(mToolbar);
-        mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (mActivity.getSupportActionBar() == null) {
+            mActivity.setSupportActionBar(mToolbar);
+            mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+            mActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            Log.d(LOG_TAG, ((ArticleDetailActivity) mActivity).mSelectedItemId + " " + String.valueOf(mToolbar) + " " + String.valueOf(mActivity.getSupportActionBar()));
+        }
+    }
+
+    public void linkToolBar() {
+        if (mActivity != null && mToolbar != null) {
+            Log.d(LOG_TAG, "linking " + mActivity + " to " + mToolbar);
+            mActivity.setSupportActionBar(mToolbar);
+            mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+            mActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        }
     }
 
     private void bindViews() {
@@ -141,6 +157,7 @@ public class ArticleDetailFragment extends Fragment implements
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         if (mCursor != null) {
+            Log.d("LOG_TAG", "bindViews with cursor:" + this + "!" + mItemId);
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
@@ -166,8 +183,7 @@ public class ArticleDetailFragment extends Fragment implements
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
-
-                                updateToolbar();
+                                Log.d("LOG_TAG", "imageloadresponse:" + this + "!" + mItemId);
                             }
                         }
 

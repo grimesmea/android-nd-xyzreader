@@ -11,8 +11,10 @@ import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
@@ -24,10 +26,11 @@ import com.example.xyzreader.data.ItemsContract;
 public class ArticleDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
+
+    private static final String LOG_TAG = ArticleDetailActivity.class.getSimpleName();
+    public long mSelectedItemId;
     private Cursor mCursor;
     private long mStartId;
-    private long mSelectedItemId;
-
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
 
@@ -50,9 +53,12 @@ public class ArticleDetailActivity extends AppCompatActivity
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
+        //setupWindowAnimations();
+
         mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageScrollStateChanged(int state) {
+                Log.d(LOG_TAG, "onPageScrollStateChanged:" + state);
                 super.onPageScrollStateChanged(state);
             }
 
@@ -60,8 +66,17 @@ public class ArticleDetailActivity extends AppCompatActivity
             public void onPageSelected(int position) {
                 if (mCursor != null) {
                     mCursor.moveToPosition(position);
+                    mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
+
+                    try {
+                        ArticleDetailFragment frag = (ArticleDetailFragment) mPagerAdapter.instantiateItem(null, position);
+                        Log.d(LOG_TAG, "On page change listening on page selected - position: " + position
+                                + " itemId:" + mSelectedItemId + " frag: " + frag);
+                        frag.linkToolBar();
+                    } catch (Exception e) {
+                        Log.w(LOG_TAG, e);
+                    }
                 }
-                mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
             }
         });
 
@@ -69,9 +84,15 @@ public class ArticleDetailActivity extends AppCompatActivity
             if (getIntent() != null && getIntent().getData() != null) {
                 mStartId = ItemsContract.Items.getItemId(getIntent().getData());
                 mSelectedItemId = mStartId;
+                Log.d(LOG_TAG, "Activity on create finished itemId: " + mSelectedItemId);
             }
         }
     }
+
+    //private void setupWindowAnimations() {
+    //    Slide slide = (Slide) TransitionInflater.from(this).inflateTransition(R.transition.slide_in);
+    //    getWindow().setEnterTransition(slide);
+    //}
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -111,9 +132,20 @@ public class ArticleDetailActivity extends AppCompatActivity
         }
 
         @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            // When exception is caught, app shows blank fragment which is an undesired behavior
+            try {
+                super.setPrimaryItem(container, position, object);
+            } catch (Exception e) {
+                Log.w(LOG_TAG, e);
+            }
+        }
+
+        @Override
         public Fragment getItem(int position) {
             mCursor.moveToPosition(position);
-            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID));
+            ArticleDetailFragment frag = ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID));
+            return frag;
         }
 
         @Override
