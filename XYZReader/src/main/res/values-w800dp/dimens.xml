@@ -4,5 +4,5 @@
 
     <!-- detail fragment -->
     <dimen name="detail_toolbar_height">400dp</dimen>
-    <dimen name="detail_margin_top">-104dp</dimen>
+    <dimen name="detail_margin_top">-112dp</dimen>
 </resources>

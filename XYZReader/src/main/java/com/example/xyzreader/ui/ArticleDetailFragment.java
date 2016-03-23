@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ShareCompat;
@@ -42,13 +43,17 @@ public class ArticleDetailFragment extends Fragment implements
     private static final String LOG_TAG = ArticleDetailFragment.class.getSimpleName();
 
     private AppCompatActivity mActivity;
-    private CollapsingToolbarLayout mCollapsingToolbarLayout;
+    private AppBarLayout mAppBar;
+    private CollapsingToolbarLayout mCollapsingToolbar;
     private Toolbar mToolbar;
     private Cursor mCursor;
     private long mItemId;
     private View mRootView;
     private int mMutedColor = 0xFF333333;
     private ImageView mPhotoView;
+
+    private int mTotalScrollRange;
+    private boolean isTitleShown;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -61,7 +66,6 @@ public class ArticleDetailFragment extends Fragment implements
         Bundle arguments = new Bundle();
         arguments.putLong(ARG_ITEM_ID, itemId);
         ArticleDetailFragment fragment = new ArticleDetailFragment();
-        Log.d(LOG_TAG, "fragment constructed: " + fragment.toString() + ":" + itemId);
         fragment.setArguments(arguments);
         return fragment;
     }
@@ -91,7 +95,6 @@ public class ArticleDetailFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "fragement view created: " + this);
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
 
         mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
@@ -105,8 +108,18 @@ public class ArticleDetailFragment extends Fragment implements
         });
 
         mActivity = (AppCompatActivity) getActivity();
+
+        mAppBar = (AppBarLayout) mRootView.findViewById(R.id.app_bar);
+        mCollapsingToolbar = (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
+
         mToolbar = (Toolbar) mRootView.findViewById(R.id.article_toolbar);
-        mCollapsingToolbarLayout = (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
+        mToolbar.setNavigationIcon(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mActivity.onBackPressed();
+            }
+        });
 
         // Work around for 	CoordinatorLayout NullPointerException in onTouchEvent
         // (https://code.google.com/p/android/issues/detail?id=183166) that did not resolve when
@@ -120,28 +133,7 @@ public class ArticleDetailFragment extends Fragment implements
         });
 
         bindViews();
-        updateToolbar();
         return mRootView;
-    }
-
-    private void updateToolbar() {
-        if (mActivity.getSupportActionBar() == null) {
-            mActivity.setSupportActionBar(mToolbar);
-            mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-            mActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-            Log.d(LOG_TAG, ((ArticleDetailActivity) mActivity).mSelectedItemId + " " + String.valueOf(mToolbar) + " " + String.valueOf(mActivity.getSupportActionBar()));
-        }
-    }
-
-    public void linkToolBar() {
-        if (mActivity != null && mToolbar != null) {
-            Log.d(LOG_TAG, "linking " + mActivity + " to " + mToolbar);
-            mActivity.setSupportActionBar(mToolbar);
-            mActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
-            mActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        }
     }
 
     private void bindViews() {
@@ -157,10 +149,29 @@ public class ArticleDetailFragment extends Fragment implements
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         if (mCursor != null) {
-            Log.d("LOG_TAG", "bindViews with cursor:" + this + "!" + mItemId);
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
+
+            mTotalScrollRange = -1;
+            isTitleShown = false;
+
+            mAppBar.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+                @Override
+                public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
+                    if (mTotalScrollRange == -1 || mTotalScrollRange == 0) {
+                        mTotalScrollRange = mAppBar.getTotalScrollRange();
+                    }
+
+                    if (mTotalScrollRange + i == 0 && mTotalScrollRange != 0) {
+                        mCollapsingToolbar.setTitle(mCursor.getString(ArticleLoader.Query.TITLE));
+                        isTitleShown = true;
+                    } else if (isTitleShown) {
+                        mCollapsingToolbar.setTitle("");
+                        isTitleShown = false;
+                    }
+                }
+            });
 
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             bylineView.setText(Html.fromHtml(
@@ -183,13 +194,12 @@ public class ArticleDetailFragment extends Fragment implements
                                 mPhotoView.setImageBitmap(imageContainer.getBitmap());
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
-                                Log.d("LOG_TAG", "imageloadresponse:" + this + "!" + mItemId);
                             }
                         }
 
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
-
+                            Log.w(LOG_TAG, volleyError);
                         }
                     });
         } else {

@@ -5,5 +5,4 @@
         <item name="android:background">?attr/colorPrimary</item>
         <item name="android:popupTheme">@style/Theme.AppCompat.Light</item>
     </style>
-
 </resources>
